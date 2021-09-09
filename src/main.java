@@ -13,7 +13,7 @@ public class main {
     private static double hf = 0;                       //Horizontal Force
     private static double hmax;                         //Max bounce Height
     private static double hstop = 0.5;                  //Minimum required max height
-    private static double k = 0.6;                      //Bounce coefficient
+    private static double k = 1;                      //Bounce coefficient
     private static double v = 0;                        //Velocity
     private static double vt = 0;                       //Velocity time
 
@@ -35,33 +35,50 @@ public class main {
         while (hmax > hstop) {
                 System.out.println(h);
                 if (fallingdown) {
-                    v = -(9.82*(vt*vt));
-                    vt += 0.01;
+                    decreaseH();
                     if (h <= 0) {
-                        fallingdown = false;
-                        t += ct;
-                        v = -v * k;
-                        vt = 0;
-                        //System.out.println("made v negative");
+                        calculateBounce();
                         if (t > 20) {
-                            hmax = 0;
-                            System.out.println("Took too long!");
+                            endSimulation();
                         }
                     }
                 }
                 else if (!contact){
-                    v -= 9.82*(vt*vt);
-                    vt += 0.01;
+                    increaseH();
                     if (v <= 0) {
-                        fallingdown = true;
-                        hmax = h;
+                        reachedApexStartVelocityDecrease();
                         //System.out.println("Reached apex and set hmax to h = " + hmax);
                     }
                 }
-                h += v;
                 t += dt;
             }
         }
+
+    private static void reachedApexStartVelocityDecrease() {
+        fallingdown = true;
+        hmax = h;
+    }
+
+    private static void increaseH () {
+        h += (9.82*(vt*vt))/2;
+        vt -= 0.01;
+    }
+
+    private static void decreaseH() {
+        h = h0 - ((9.82*(vt*vt))/2);
+        vt += 0.01;
+    }
+
+    private static void endSimulation() {
+        hmax = 0;
+        System.out.println("Took too long!");
+    }
+
+    private static void calculateBounce() {
+        fallingdown = false;
+        t += ct;
+        System.out.println("Bounced at t=" + t + "!");
+    }
 
     static boolean valueinputter(String inputtext, String inputmessage) {
         inputmessage = "Please input desired dropheight in meters: ";
